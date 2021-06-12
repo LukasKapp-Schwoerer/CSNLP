@@ -22,6 +22,9 @@ class Wiktionary:
             json_data = json.loads(line)
             word = json_data['word']
 
+            if word in self.data.keys():
+                continue # Use the first definition per concept
+
             senses = json_data[word] = json_data['senses']              
 
             if 'glosses' in senses[0]:
