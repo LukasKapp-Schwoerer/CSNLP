@@ -17,8 +17,19 @@ Webpage: [https://snap.stanford.edu/qagnn](https://snap.stanford.edu/qagnn)
   <img src="./figs/overview.png" width="1000" title="Overview of QA-GNN" alt="">
 </p>
 
+## Usage of Wiktionary
+``` python
+from wiktionary.wiktionary import Wiktionary
 
-## Usage
+wiktionary = Wiktionary()
+print("taking notes: ", wiktionary["taking notes"])
+```
+outputs
+```
+taking notes:  To make a record of what one hears or observes for future reference.
+```
+
+## Usage of QA-GNN
 ### 0. Dependencies
 
 - [Python](<https://www.python.org/>) == 3.7
