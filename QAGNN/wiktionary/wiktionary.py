@@ -72,9 +72,6 @@ class Wiktionary:
             if value != None:
                 return value
 
-        if not query.isLower():
-            return find_entry(query.lower())
-        
         raise KeyError
 
     def __getitem__(self, query):
@@ -87,6 +84,8 @@ class Wiktionary:
             ii) lemmaform by Spacy (Honnibal and Montani, 2017);
             iii) base word (last word). 
         """
+
+        query = query.replace('.', '')
 
         entry = self.find_entry(query)
 
