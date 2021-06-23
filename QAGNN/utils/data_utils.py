@@ -11,6 +11,8 @@ except:
 import json
 from tqdm import tqdm
 
+from wiktionary.wiktionary import Wiktionary
+
 GPT_SPECIAL_TOKENS = ['_start_', '_delimiter_', '_classify_']
 
 
@@ -332,6 +334,21 @@ def load_bert_xlnet_roberta_input_tensors(statement_jsonl_path, model_type, mode
             `cls_token_segment_id` define the segment id associated to the CLS token (0 for BERT, 2 for XLNet)
         """
         label_map = {label: i for i, label in enumerate(label_list)}
+
+        # prepend questions with wikionary contexts about answers
+        wiktionary = Wiktionary()
+
+        for example in examples:
+            for ending_index, ending in enumerate(example.endings):
+                # print(f"prepending question '{example.contexts[ending_index]}' with wiktionary entry for '{ending}'")
+                try:
+                    # print(f"Wiktionary: {ending} is '{wiktionary[ending]}'")
+
+                    definition = f"{ending} means {wiktionary[ending]}"
+                    example.contexts[ending_index] = definition + ' ' + example.contexts[ending_index]
+
+                except KeyError:
+                    print(f"Wiktionary: Not found: {ending}")
 
         features = []
         for ex_index, example in enumerate(examples):
