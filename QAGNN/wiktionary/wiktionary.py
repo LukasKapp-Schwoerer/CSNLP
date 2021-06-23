@@ -28,7 +28,7 @@ class Wiktionary:
             senses = json_data[word] = json_data['senses']              
 
             if 'glosses' in senses[0]:
-                self.data[word] = senses[0] # store str of 1st sense in dict
+                self.data[word.lower()] = senses[0] # store str of 1st sense in dict
 
         print(f"Indexing wiktionary completed. Found {len(self.data)} concepts.")
 
