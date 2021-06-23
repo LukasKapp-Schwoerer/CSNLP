@@ -28,7 +28,11 @@ class Wiktionary:
             senses = json_data[word] = json_data['senses']              
 
             if 'glosses' in senses[0]:
-                self.data[word.lower()] = senses[0] # store str of 1st sense in dict
+                self.data[word] = senses[0] # store str of 1st sense in dict
+
+                if not word.lower() in self.data.keys():
+                    self.data[word.lower()] = senses[0] # store lower case version as backup
+
 
         print(f"Indexing wiktionary completed. Found {len(self.data)} concepts.")
 
@@ -67,6 +71,9 @@ class Wiktionary:
             value = self.data.get(new_query)
             if value != None:
                 return value
+
+        if not query.isLower():
+            return find_entry(query.lower())
         
         raise KeyError
 
@@ -81,8 +88,6 @@ class Wiktionary:
             iii) base word (last word). 
         """
 
-        query = query.lower()
-        
         entry = self.find_entry(query)
 
         while 'form_of' in entry.keys():
