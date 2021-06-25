@@ -11,8 +11,9 @@ from scipy.sparse import csr_matrix, coo_matrix
 from multiprocessing import Pool
 from collections import OrderedDict
 
-
 from .maths import *
+
+from wiktionary.wiktionary import Wiktionary
 
 __all__ = ['generate_graph']
 
@@ -278,6 +279,8 @@ LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
 LM_MODEL.cuda(); LM_MODEL.eval()
 print ('loading done')
 
+wikionary = Wiktionary()
+
 def get_LM_score(cids, question):
     cids = cids[:]
     cids.insert(0, -1) #QAcontext node
@@ -286,7 +289,19 @@ def get_LM_score(cids, question):
         if cid==-1:
             sent = question.lower()
         else:
-            sent = '{} {}.'.format(question.lower(), ' '.join(id2concept[cid].split('_')))
+            # prepend wiktionary concept defintion
+            concept = ' '.join(id2concept[cid].split('_'))
+            # print(f"question: {question}")
+            # print(f"concept: {concept}")
+            try:
+                definition = f"{concept} is defined as {wikionary[concept]}"
+            except KeyError:
+                # print(f"could not find definition of {concept}")
+                definition = ""
+
+            sent = f"{definition} {question.lower()} {concept}."
+            # print(sent)
+
         sent = TOKENIZER.encode(sent, add_special_tokens=True)
         sents.append(sent)
     n_cids = len(cids)
