@@ -274,9 +274,9 @@ class RobertaForMaskedLMwithLoss(RobertaForMaskedLM):
         return outputs
 
 print ('loading pre-trained LM...')
-print('NOTE: CHANGED TO ROBERTA-BASE FOR TESTING CODE')
-TOKENIZER = RobertaTokenizer.from_pretrained('roberta-base')
-LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-base')
+#print('NOTE: CHANGED TO ROBERTA-BASE FOR TESTING CODE')
+TOKENIZER = RobertaTokenizer.from_pretrained('roberta-large')
+LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
 LM_MODEL.cuda(); LM_MODEL.eval()
 print ('loading done')
 
@@ -295,7 +295,7 @@ def get_LM_score(cids, question, wiki_def='none'):
             # print(f"question: {question}")
             # print(f"concept: {concept}")
             try:
-                definition = f"{concept} is defined as {wikionary[concept]}"
+                definition = f"{concept} is defined as {wikionary[concept]}."
             except KeyError:
                 # print(f"could not find definition of {concept}")
                 definition = ""
@@ -305,11 +305,12 @@ def get_LM_score(cids, question, wiki_def='none'):
             elif wiki_def == 'mid':
                 sent = f"{question.lower()} {definition} {concept}."
             elif wiki_def == 'post':
-                sent = f"{question.lower()} {concept} {definition}."
+                sent = f"{question.lower()} {concept} {definition}"
             else:
+                # do not use definition
                 sent = f"{question.lower()} {concept}"
             
-            print(sent)
+            # print(sent)
 
         sent = TOKENIZER.encode(sent, add_special_tokens=True)
         sents.append(sent)
