@@ -274,14 +274,15 @@ class RobertaForMaskedLMwithLoss(RobertaForMaskedLM):
         return outputs
 
 print ('loading pre-trained LM...')
-TOKENIZER = RobertaTokenizer.from_pretrained('roberta-large')
-LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
+print('NOTE: CHANGED TO ROBERTA-BASE FOR TESTING CODE')
+TOKENIZER = RobertaTokenizer.from_pretrained('roberta-base')
+LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-base')
 LM_MODEL.cuda(); LM_MODEL.eval()
 print ('loading done')
 
 wikionary = Wiktionary()
 
-def get_LM_score(cids, question):
+def get_LM_score(cids, question, wiki_def='none'):
     cids = cids[:]
     cids.insert(0, -1) #QAcontext node
     sents, scores = [], []
@@ -298,9 +299,17 @@ def get_LM_score(cids, question):
             except KeyError:
                 # print(f"could not find definition of {concept}")
                 definition = ""
-
-            sent = f"{definition} {question.lower()} {concept}."
-            # print(sent)
+            
+            if wiki_def == 'pre':
+                sent = f"{definition} {question.lower()} {concept}."
+            elif wiki_def == 'mid':
+                sent = f"{question.lower()} {definition} {concept}."
+            elif wiki_def == 'post':
+                sent = f"{question.lower()} {concept} {definition}."
+            else:
+                sent = f"{question.lower()} {concept}"
+            
+            print(sent)
 
         sent = TOKENIZER.encode(sent, add_special_tokens=True)
         sents.append(sent)
@@ -338,9 +347,9 @@ def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part1(data):
     extra_nodes = extra_nodes - qa_nodes
     return (sorted(qc_ids), sorted(ac_ids), question, sorted(extra_nodes))
 
-def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(data):
+def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(data, wiki_def):
     qc_ids, ac_ids, question, extra_nodes = data
-    cid2score = get_LM_score(qc_ids+ac_ids+extra_nodes, question)
+    cid2score = get_LM_score(qc_ids+ac_ids+extra_nodes, question, wiki_def)
     return (qc_ids, ac_ids, question, extra_nodes, cid2score)
 
 def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part3(data):
@@ -475,7 +484,7 @@ def generate_adj_data_from_grounded_concepts(grounded_path, cpnet_graph_path, cp
 
 
 
-def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_path, cpnet_vocab_path, output_path, num_processes):
+def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_path, cpnet_vocab_path, output_path, num_processes, wiki_def):
     """
     This function will save
         (1) adjacency matrics (each in the form of a (R*N, N) coo sparse matrix)
@@ -521,7 +530,7 @@ def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_
     res2 = []
     for j, _data in enumerate(res1):
         if j % 100 == 0: print (j)
-        res2.append(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(_data))
+        res2.append(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(_data, wiki_def))
 
     with Pool(num_processes) as p:
         res3 = list(tqdm(p.imap(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part3, res2), total=len(res2)))
