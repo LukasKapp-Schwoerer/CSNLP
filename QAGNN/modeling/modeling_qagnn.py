@@ -226,7 +226,11 @@ class LM_QAGNN(nn.Module):
         edge_index, edge_type = self.batch_graph(edge_index, edge_type, concept_ids.size(1))
         adj = (edge_index.to(node_type_ids.device), edge_type.to(node_type_ids.device)) #edge_index: [2, total_E]   edge_type: [total_E, ]
 
+
+        print("I think this is sent vecs before encoder", lm_inputs[0].size())
         sent_vecs, all_hidden_states = self.encoder(*lm_inputs, layer_id=layer_id)
+
+        print("Sent vecs size after encoder", sent_vecs.size())
         logits, attn = self.decoder(sent_vecs.to(node_type_ids.device),
                                     concept_ids,
                                     node_type_ids, node_scores, adj_lengths, adj,

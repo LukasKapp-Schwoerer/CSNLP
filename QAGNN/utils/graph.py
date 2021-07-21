@@ -275,7 +275,7 @@ class RobertaForMaskedLMwithLoss(RobertaForMaskedLM):
 print ('loading pre-trained LM...')
 TOKENIZER = RobertaTokenizer.from_pretrained('roberta-large')
 LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
-LM_MODEL.cuda(); LM_MODEL.eval()
+LM_MODEL.cuda(); LM_MODEL.eval() # I am pretty confident this means relevance scoring is zero-shot
 print ('loading done')
 
 def get_LM_score(cids, question):
@@ -478,7 +478,7 @@ def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_
     """
     print(f'generating adj data for {grounded_path}...')
 
-    global concept2id, id2concept, relation2id, id2relation, cpnet_simple, cpnet
+    global f, id2concept, relation2id, id2relation, cpnet_simple, cpnet
     if any(x is None for x in [concept2id, id2concept, relation2id, id2relation]):
         load_resources(cpnet_vocab_path)
     if cpnet is None or cpnet_simple is None:

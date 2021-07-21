@@ -445,6 +445,7 @@ def load_bert_xlnet_roberta_input_tensors(statement_jsonl_path, model_type, mode
         tokenizer_class = {'bert': BertTokenizer, 'xlnet': XLNetTokenizer, 'roberta': RobertaTokenizer}.get(model_type)
     tokenizer = tokenizer_class.from_pretrained(model_name)
     examples = read_examples(statement_jsonl_path)
+    # print("EXAMPLES", examples)
     features = convert_examples_to_features(examples, list(range(len(examples[0].endings))), max_seq_length, tokenizer,
                                             cls_token_at_end=bool(model_type in ['xlnet']),  # xlnet has a cls token at the end
                                             cls_token=tokenizer.cls_token,
@@ -461,6 +462,7 @@ def load_bert_xlnet_roberta_input_tensors(statement_jsonl_path, model_type, mode
 
 
 def load_input_tensors(input_jsonl_path, model_type, model_name, max_seq_length):
+    print("THERE IS SOME MAGIC GOING ON HERE")
     if model_type in ('lstm',):
         raise NotImplementedError
     elif model_type in ('gpt',):

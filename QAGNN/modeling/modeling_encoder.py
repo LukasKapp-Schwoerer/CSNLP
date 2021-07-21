@@ -12,6 +12,9 @@ from transformers import AutoModel
 from utils.layers import *
 from utils.data_utils import get_gpt_token_num
 
+from transformers import BertTokenizer
+
+
 MODEL_CLASS_TO_NAME = {
     'gpt': list(OPENAI_GPT_PRETRAINED_CONFIG_ARCHIVE_MAP.keys()),
     'bert': list(BERT_PRETRAINED_CONFIG_ARCHIVE_MAP.keys()),
@@ -90,6 +93,14 @@ class TextEncoder(nn.Module):
         self.output_token_states = output_token_states
         assert not self.output_token_states or self.model_type in ('bert', 'roberta', 'albert')
 
+
+        # TODO: temporary, remove
+        with open("./data/cpnet/concept.txt", "r", encoding="utf8") as fin:
+            self.id2concept = [w.strip() for w in fin]
+        
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+
         if self.model_type in ('lstm',):
             self.module = LSTMTextEncoder(**kwargs, output_hidden_states=True)
             self.sent_dim = self.module.output_size
@@ -114,8 +125,15 @@ class TextEncoder(nn.Module):
             input_ids, cls_token_ids, lm_labels = inputs  # lm_labels is not used
             outputs = self.module(input_ids)
         else:  # bert / xlnet / roberta
+            
             input_ids, attention_mask, token_type_ids, output_mask = inputs
+
+            print("cids ", input_ids[0])
+            print("bert_tokens 0", self.tokenizer.convert_ids_to_tokens(input_ids[0].tolist()))
+            print("bert_tokens 1", self.tokenizer.convert_ids_to_tokens(input_ids[1].tolist()))
+
             outputs = self.module(input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
+
         all_hidden_states = outputs[-1]
         hidden_states = all_hidden_states[layer_id]
 
