@@ -3,7 +3,7 @@ dt=`date '+%Y%m%d_%H%M%S'`
 
 
 dataset="obqa"
-model='bert-base-uncased' # TODO change this to roberta-large
+model='roberta-large'
 shift
 shift
 args=$@

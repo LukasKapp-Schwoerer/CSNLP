@@ -94,11 +94,11 @@ class TextEncoder(nn.Module):
         assert not self.output_token_states or self.model_type in ('bert', 'roberta', 'albert')
 
 
-        # TODO: temporary, remove
-        with open("./data/cpnet/concept.txt", "r", encoding="utf8") as fin:
-            self.id2concept = [w.strip() for w in fin]
+        # # TODO: temporary, remove
+        # with open("./data/cpnet/concept.txt", "r", encoding="utf8") as fin:
+        #     self.id2concept = [w.strip() for w in fin]
         
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 
         if self.model_type in ('lstm',):
