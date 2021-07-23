@@ -6,6 +6,7 @@ from utils.convert_obqa import convert_to_obqa_statement
 from utils.conceptnet import extract_english, construct_graph
 from utils.grounding import create_matcher_patterns, ground
 from utils.graph import generate_adj_data_from_grounded_concepts__use_LM
+from wiktionary.embeddings import cpnet_to_wiktionary_defs, embed_wiktionary_defs
 
 input_paths = {
     'csqa': {
@@ -35,6 +36,8 @@ output_paths = {
         'patterns': './data/cpnet/matcher_patterns.json',
         'unpruned-graph': './data/cpnet/conceptnet.en.unpruned.graph',
         'pruned-graph': './data/cpnet/conceptnet.en.pruned.graph',
+        'wiktionary-definitions': './data/cpnet/concept_defs.npy',
+        'wiktionary-embeddings': './data/cpnet/concept_emb.npy',
     },
     'csqa': {
         'statement': {
@@ -107,6 +110,8 @@ def main():
             {'func': construct_graph, 'args': (output_paths['cpnet']['csv'], output_paths['cpnet']['vocab'],
                                                output_paths['cpnet']['pruned-graph'], True)},
             {'func': create_matcher_patterns, 'args': (output_paths['cpnet']['vocab'], output_paths['cpnet']['patterns'])},
+            {'func': cpnet_to_wiktionary_defs, 'args': (output_paths['cpnet']['vocab'], output_paths['cpnet']['wiktionary-definitions'])},
+            {'func': embed_wiktionary_defs, 'args': (output_paths['cpnet']['wiktionary-definitions'], output_paths['cpnet']['wiktionary-embeddings'])}
         ],
         'csqa': [
             {'func': convert_to_entailment, 'args': (input_paths['csqa']['train'], output_paths['csqa']['statement']['train'])},
@@ -139,7 +144,8 @@ def main():
         ],
     }
 
-    for rt in args.run:
+    for rt in args.run: # default here is only common TODO: @ team, do we even preprocess th rest then?
+        
         for rt_dic in routines[rt]:
             rt_dic['func'](*rt_dic['args'])
 

@@ -3,15 +3,18 @@ import urllib.request
 import json
 import spacy
 
+from utils.utils import check_path
+
 class Wiktionary:
 
     def __init__(self):
 
-        json_path = "wiktionary/wiktionary_en.json"
+        json_path = "./data/wiktionary/wiktionary_en.json"
 
         if not os.path.exists(json_path):
             database_url = "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.json"
             print("Downloading wiktionary_en")
+            check_path(json_path) # creates the directory along the path
             urllib.request.urlretrieve(database_url, json_path)
             print("Downloading wiktionary_en completed")
 
@@ -89,7 +92,9 @@ class Wiktionary:
 
         entry = self.find_entry(query)
 
-        while 'form_of' in entry.keys():
-            entry = self.data[entry['form_of'][0]]
+        prev = None
+        while 'form_of' in entry.keys() and prev != self.data[entry['form_of'][0]['word']]:
+            entry = self.data[entry['form_of'][0]['word']]
+            prev = entry # this avoids an infinite loop
 
         return entry['glosses'][0]
