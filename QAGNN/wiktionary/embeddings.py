@@ -2,6 +2,7 @@ import numpy as np
 from wiktionary.wiktionary import Wiktionary
 from transformers import RobertaTokenizer, RobertaModel
 import torch
+from tqdm import tqdm
 
 def cpnet_to_wiktionary_defs(vocab_path, output_path):
     """
@@ -13,12 +14,14 @@ def cpnet_to_wiktionary_defs(vocab_path, output_path):
         ent_arr = np.array(entities.read().splitlines())
         wiktionary = Wiktionary()
 
-        for i in range(ent_arr.size):         
+        for i in tqdm(range(ent_arr.size), desc='cpnet_to_wiktionary_defs'):         
             try:
+                # print("retrieving concept net entity", ent_arr[i], "in wiktionary", flush=True)
                 ent_arr[i] = wiktionary[ent_arr[i].replace("_", " ")]
             except KeyError:
-                print("concept net entity not found", ent_arr[i], "not found")
-
+                # print("concept net entity not found", ent_arr[i], "not found", flush=True)
+                pass
+        
         np.save(output_path, ent_arr)
 
 
@@ -40,7 +43,7 @@ def embed_wiktionary_defs(definition_path, output_path):
     
         cp_net_embeddings = torch.zeros((all_defs.size, emb_dim)) # size (num_concepts, 768)
         
-        for i in range(all_defs.size):
+        for i in tqdm(range(all_defs.size), desc='embed_wiktinoary_defs'):
             tokens = tokenizer.encode(all_defs[i], add_special_tokens=True, return_tensors="pt")
             attention_mask = torch.ones((1,tokens.size(1))) # TODO @team: is this reasonable to encode like this?
             
