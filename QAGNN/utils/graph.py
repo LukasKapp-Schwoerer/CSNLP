@@ -14,6 +14,8 @@ from collections import OrderedDict
 
 from .maths import *
 
+from wiktionary.wiktionary import Wiktionary
+
 __all__ = ['generate_graph']
 
 concept2id = None
@@ -278,16 +280,46 @@ LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
 LM_MODEL.cuda(); LM_MODEL.eval()
 print ('loading done')
 
-def get_LM_score(cids, question):
+wikionary = Wiktionary()
+
+def get_LM_score(cids, question, status):
     cids = cids[:]
     cids.insert(0, -1) #QAcontext node
     sents, scores = [], []
     for cid in cids:
         if cid==-1:
             sent = question.lower()
+            sent = TOKENIZER.encode(sent, add_special_tokens=True)
         else:
-            sent = '{} {}.'.format(question.lower(), ' '.join(id2concept[cid].split('_')))
-        sent = TOKENIZER.encode(sent, add_special_tokens=True)
+            # prepend wiktionary concept defintion
+            concept = ' '.join(id2concept[cid].split('_'))
+            # print(f"question: {question}")
+            # print(f"concept: {concept}")
+            try:
+                if status == 'train':
+                    definition = f"is defined as {wikionary[concept]}"
+                    sent = f"{definition} {question.lower()}."
+                    sent = TOKENIZER.encode(sent, add_special_tokens=True)
+                    sent = [[sent[0]] + [-1] + sent[1:-1] + [-1] + [sent[-1]]] # 1. UNK for definition; 2. UNK for concept
+
+                else:
+                    definition = f"{concept} is defined as {wikionary[concept]}"
+                    sent = f"{definition} {question.lower()} {concept}."
+                    sent = TOKENIZER.encode(sent, add_special_tokens=True)
+
+            except KeyError:
+                # print(f"could not find definition of {concept}")
+                definition = ""
+                if status == 'train':
+                    sent = f"{definition} {question.lower()}."
+                    sent = TOKENIZER.encode(sent, add_special_tokens=True)
+                    sent = [sent[:-1] + [-1] + [sent[-1]]] #1. UNK for concept
+
+                else:
+                    sent = f"{definition} {question.lower()} {concept}."
+                    sent = TOKENIZER.encode(sent, add_special_tokens=True)
+
+            # print(sent) 
         sents.append(sent)
     n_cids = len(cids)
     cur_idx = 0
@@ -323,9 +355,9 @@ def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part1(data):
     extra_nodes = extra_nodes - qa_nodes
     return (sorted(qc_ids), sorted(ac_ids), question, sorted(extra_nodes))
 
-def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(data):
+def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(data, status):
     qc_ids, ac_ids, question, extra_nodes = data
-    cid2score = get_LM_score(qc_ids+ac_ids+extra_nodes, question)
+    cid2score = get_LM_score(qc_ids+ac_ids+extra_nodes, question, status)
     return (qc_ids, ac_ids, question, extra_nodes, cid2score)
 
 def concepts_to_adj_matrices_2hop_all_pair__use_LM__Part3(data):
@@ -486,6 +518,8 @@ def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_
 
     qa_data = []
     statement_path = grounded_path.replace('grounded', 'statement')
+    status = 'train' if statement_path.find('train') else 'test' # to differentiate between train or val/test
+
     with open(grounded_path, 'r', encoding='utf-8') as fin_ground, open(statement_path, 'r', encoding='utf-8') as fin_state:
         lines_ground = fin_ground.readlines()
         lines_state  = fin_state.readlines()
@@ -506,7 +540,7 @@ def generate_adj_data_from_grounded_concepts__use_LM(grounded_path, cpnet_graph_
     res2 = []
     for j, _data in enumerate(res1):
         if j % 100 == 0: print (j)
-        res2.append(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(_data))
+        res2.append(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part2(_data, status))
 
     with Pool(num_processes) as p:
         res3 = list(tqdm(p.imap(concepts_to_adj_matrices_2hop_all_pair__use_LM__Part3, res2), total=len(res2)))
