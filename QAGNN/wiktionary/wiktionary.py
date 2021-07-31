@@ -89,7 +89,9 @@ class Wiktionary:
 
         entry = self.find_entry(query)
 
-        while 'form_of' in entry.keys():
-            entry = self.data[entry['form_of'][0]]
+        prev = []                                                                                                 
+        while 'form_of' in entry.keys() and self.data[entry['form_of'][0]['word']] not in prev:
+            entry = self.data[entry['form_of'][0]['word']]
+            prev.append(entry) # this avoids an infinite loop
 
         return entry['glosses'][0]
