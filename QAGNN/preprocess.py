@@ -8,82 +8,84 @@ from utils.grounding import create_matcher_patterns, ground
 from utils.graph import generate_adj_data_from_grounded_concepts__use_LM
 from wiktionary.embeddings import cpnet_to_wiktionary_defs, embed_wiktionary_defs
 
+data_dir = '/scratch/lukasks/CSNLP.git/QAGNN/data_preprocessing_cpnet_wiktionary/'
+
 input_paths = {
     'csqa': {
-        'train': './data/csqa/train_rand_split.jsonl',
-        'dev': './data/csqa/dev_rand_split.jsonl',
-        'test': './data/csqa/test_rand_split_no_answers.jsonl',
+        'train': data_dir + 'csqa/train_rand_split.jsonl',
+        'dev': data_dir + 'csqa/dev_rand_split.jsonl',
+        'test': data_dir + 'csqa/test_rand_split_no_answers.jsonl',
     },
     'obqa': {
-        'train': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/train.jsonl',
-        'dev': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/dev.jsonl',
-        'test': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/test.jsonl',
+        'train': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Main/train.jsonl',
+        'dev': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Main/dev.jsonl',
+        'test': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Main/test.jsonl',
     },
     'obqa-fact': {
-        'train': './data/obqa/OpenBookQA-V1-Sep2018/Data/Additional/train_complete.jsonl',
-        'dev': './data/obqa/OpenBookQA-V1-Sep2018/Data/Additional/dev_complete.jsonl',
-        'test': './data/obqa/OpenBookQA-V1-Sep2018/Data/Additional/test_complete.jsonl',
+        'train': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Additional/train_complete.jsonl',
+        'dev': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Additional/dev_complete.jsonl',
+        'test': data_dir + 'obqa/OpenBookQA-V1-Sep2018/Data/Additional/test_complete.jsonl',
     },
     'cpnet': {
-        'csv': './data/cpnet/conceptnet-assertions-5.6.0.csv',
+        'csv': data_dir + 'cpnet/conceptnet-assertions-5.6.0.csv',
     },
 }
 
 output_paths = {
     'cpnet': {
-        'csv': './data/cpnet/conceptnet.en.csv',
-        'vocab': './data/cpnet/concept.txt',
-        'patterns': './data/cpnet/matcher_patterns.json',
-        'unpruned-graph': './data/cpnet/conceptnet.en.unpruned.graph',
-        'pruned-graph': './data/cpnet/conceptnet.en.pruned.graph',
-        'wiktionary-definitions': './data/cpnet/concept_defs.npy',
-        'wiktionary-embeddings': './data/cpnet/concept_emb.npy',
+        'csv': data_dir + 'cpnet/conceptnet.en.csv',
+        'vocab': data_dir + 'cpnet/concept.txt',
+        'patterns': data_dir + 'cpnet/matcher_patterns.json',
+        'unpruned-graph': data_dir + 'cpnet/conceptnet.en.unpruned.graph',
+        'pruned-graph': data_dir + 'cpnet/conceptnet.en.pruned.graph',
+        'wiktionary-definitions': data_dir + 'cpnet/concept_defs.npy',
+        'wiktionary-embeddings': data_dir + 'cpnet/concept_emb.npy',
     },
     'csqa': {
         'statement': {
-            'train': './data/csqa/statement/train.statement.jsonl',
-            'dev': './data/csqa/statement/dev.statement.jsonl',
-            'test': './data/csqa/statement/test.statement.jsonl',
+            'train': data_dir + 'csqa/statement/train.statement.jsonl',
+            'dev': data_dir + 'csqa/statement/dev.statement.jsonl',
+            'test': data_dir + 'csqa/statement/test.statement.jsonl',
         },
         'grounded': {
-            'train': './data/csqa/grounded/train.grounded.jsonl',
-            'dev': './data/csqa/grounded/dev.grounded.jsonl',
-            'test': './data/csqa/grounded/test.grounded.jsonl',
+            'train': data_dir + 'csqa/grounded/train.grounded.jsonl',
+            'dev': data_dir + 'csqa/grounded/dev.grounded.jsonl',
+            'test': data_dir + 'csqa/grounded/test.grounded.jsonl',
         },
         'graph': {
-            'adj-train': './data/csqa/graph/train.graph.adj.pk',
-            'adj-dev': './data/csqa/graph/dev.graph.adj.pk',
-            'adj-test': './data/csqa/graph/test.graph.adj.pk',
+            'adj-train': data_dir + 'csqa/graph/train.graph.adj.pk',
+            'adj-dev': data_dir + 'csqa/graph/dev.graph.adj.pk',
+            'adj-test': data_dir + 'csqa/graph/test.graph.adj.pk',
         },
     },
     'obqa': {
         'statement': {
-            'train': './data/obqa/statement/train.statement.jsonl',
-            'dev': './data/obqa/statement/dev.statement.jsonl',
-            'test': './data/obqa/statement/test.statement.jsonl',
-            'train-fairseq': './data/obqa/fairseq/official/train.jsonl',
-            'dev-fairseq': './data/obqa/fairseq/official/valid.jsonl',
-            'test-fairseq': './data/obqa/fairseq/official/test.jsonl',
+            'train': data_dir + 'obqa/statement/train.statement.jsonl',
+            'dev': data_dir + 'obqa/statement/dev.statement.jsonl',
+            'test': data_dir + 'obqa/statement/test.statement.jsonl',
+            'train-fairseq': data_dir + 'obqa/fairseq/official/train.jsonl',
+            'dev-fairseq': data_dir + 'obqa/fairseq/official/valid.jsonl',
+            'test-fairseq': data_dir + 'obqa/fairseq/official/test.jsonl',
         },
         'grounded': {
-            'train': './data/obqa/grounded/train.grounded.jsonl',
-            'dev': './data/obqa/grounded/dev.grounded.jsonl',
-            'test': './data/obqa/grounded/test.grounded.jsonl',
+            'train': data_dir + 'obqa/grounded/train.grounded.jsonl',
+            'dev': data_dir + 'obqa/grounded/dev.grounded.jsonl',
+            'test': data_dir + 'obqa/grounded/test.grounded.jsonl',
         },
         'graph': {
-            'adj-train': './data/obqa/graph/train.graph.adj.pk',
-            'adj-dev': './data/obqa/graph/dev.graph.adj.pk',
-            'adj-test': './data/obqa/graph/test.graph.adj.pk',
+            'adj-train': data_dir + 'obqa/graph/train.graph.adj.pk',
+            'adj-dev': data_dir + 'obqa/graph/dev.graph.adj.pk',
+            'adj-test': data_dir + 'obqa/graph/test.graph.adj.pk',
         },
     },
     'obqa-fact': {
         'statement': {
-            'train': './data/obqa/statement/train-fact.statement.jsonl',
-            'dev': './data/obqa/statement/dev-fact.statement.jsonl',
-            'test': './data/obqa/statement/test-fact.statement.jsonl',
-            'train-fairseq': './data/obqa/fairseq/official/train-fact.jsonl',
-            'dev-fairseq': './data/obqa/fairseq/official/valid-fact.jsonl',
-            'test-fairseq': './data/obqa/fairseq/official/test-fact.jsonl',
+            'train': data_dir + 'obqa/statement/train-fact.statement.jsonl',
+            'dev': data_dir + 'obqa/statement/dev-fact.statement.jsonl',
+            'test': data_dir + 'obqa/statement/test-fact.statement.jsonl',
+            'train-fairseq': data_dir + 'obqa/fairseq/official/train-fact.jsonl',
+            'dev-fairseq': data_dir + 'obqa/fairseq/official/valid-fact.jsonl',
+            'test-fairseq': data_dir + 'obqa/fairseq/official/test-fact.jsonl',
         },
     },
 }
@@ -91,7 +93,7 @@ output_paths = {
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run', default=['common'], choices=['common', 'csqa', 'hswag', 'anli', 'exp', 'scitail', 'phys', 'socialiqa', 'obqa', 'obqa-fact', 'make_word_vocab'], nargs='+')
+    parser.add_argument('--run', default=['common'], choices=['common', 'wiktionary', 'csqa', 'hswag', 'anli', 'exp', 'scitail', 'phys', 'socialiqa', 'obqa', 'obqa-fact', 'make_word_vocab'], nargs='+')
     parser.add_argument('--path_prune_threshold', type=float, default=0.12, help='threshold for pruning paths')
     parser.add_argument('--max_node_num', type=int, default=200, help='maximum number of nodes per graph')
     parser.add_argument('-p', '--nprocs', type=int, default=cpu_count(), help='number of processes to use')
@@ -110,6 +112,10 @@ def main():
             {'func': construct_graph, 'args': (output_paths['cpnet']['csv'], output_paths['cpnet']['vocab'],
                                                output_paths['cpnet']['pruned-graph'], True)},
             {'func': create_matcher_patterns, 'args': (output_paths['cpnet']['vocab'], output_paths['cpnet']['patterns'])},
+            {'func': cpnet_to_wiktionary_defs, 'args': (output_paths['cpnet']['vocab'], output_paths['cpnet']['wiktionary-definitions'])},
+            {'func': embed_wiktionary_defs, 'args': (output_paths['cpnet']['wiktionary-definitions'], output_paths['cpnet']['wiktionary-embeddings'])}
+        ],
+        'wiktionary': [
             {'func': cpnet_to_wiktionary_defs, 'args': (output_paths['cpnet']['vocab'], output_paths['cpnet']['wiktionary-definitions'])},
             {'func': embed_wiktionary_defs, 'args': (output_paths['cpnet']['wiktionary-definitions'], output_paths['cpnet']['wiktionary-embeddings'])}
         ],

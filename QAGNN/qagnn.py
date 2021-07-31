@@ -47,9 +47,9 @@ def main():
 
     # data
     parser.add_argument('--num_relation', default=38, type=int, help='number of relations')
-    parser.add_argument('--train_adj', default=f'data/{args.dataset}/graph/train.graph.adj.pk')
-    parser.add_argument('--dev_adj', default=f'data/{args.dataset}/graph/dev.graph.adj.pk')
-    parser.add_argument('--test_adj', default=f'data/{args.dataset}/graph/test.graph.adj.pk')
+    parser.add_argument('--train_adj')
+    parser.add_argument('--dev_adj')
+    parser.add_argument('--test_adj')
     parser.add_argument('--use_cache', default=True, type=bool_flag, nargs='?', const=True, help='use cached data to accelerate data loading')
 
     # model architecture
@@ -212,7 +212,7 @@ def train(args):
     freeze_net(model.encoder)
     if True:
     # try:
-        for epoch_id in range(args.n_epochs):
+        for epoch_id in tqdm(range(args.n_epochs)):
             if epoch_id == args.unfreeze_epoch:
                 unfreeze_net(model.encoder)
             if epoch_id == args.refreeze_epoch:
