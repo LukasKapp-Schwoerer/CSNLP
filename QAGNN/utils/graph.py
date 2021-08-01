@@ -300,7 +300,7 @@ def get_LM_score(cids, question, status):
                     definition = f"is defined as {wikionary[concept]}"
                     sent = f"{definition} {question.lower()}."
                     sent = TOKENIZER.encode(sent, add_special_tokens=True)
-                    sent = [[sent[0]] + [-1] + sent[1:-1] + [-1] + [sent[-1]]] # 1. UNK for definition; 2. UNK for concept
+                    sent = [sent[0]] + [-1] + sent[1:-1] + [-1] + [sent[-1]] # 1. UNK for definition; 2. UNK for concept
 
                 else:
                     definition = f"{concept} is defined as {wikionary[concept]}"
@@ -313,7 +313,7 @@ def get_LM_score(cids, question, status):
                 if status == 'train':
                     sent = f"{definition} {question.lower()}."
                     sent = TOKENIZER.encode(sent, add_special_tokens=True)
-                    sent = [sent[:-1] + [-1] + [sent[-1]]] #1. UNK for concept
+                    sent = sent[:-1] + [-1] + [sent[-1]] #1. UNK for concept
 
                 else:
                     sent = f"{definition} {question.lower()} {concept}."
