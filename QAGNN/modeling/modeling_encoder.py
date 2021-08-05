@@ -128,9 +128,9 @@ class TextEncoder(nn.Module):
             
             input_ids, attention_mask, token_type_ids, output_mask = inputs
 
-            print("cids ", input_ids[0])
-            print("bert_tokens 0", self.tokenizer.convert_ids_to_tokens(input_ids[0].tolist()))
-            print("bert_tokens 1", self.tokenizer.convert_ids_to_tokens(input_ids[1].tolist()))
+            # print("cids ", input_ids[0])
+            # print("bert_tokens 0", self.tokenizer.convert_ids_to_tokens(input_ids[0].tolist()))
+            # print("bert_tokens 1", self.tokenizer.convert_ids_to_tokens(input_ids[1].tolist()))
 
             outputs = self.module(input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
 

@@ -462,7 +462,6 @@ def load_bert_xlnet_roberta_input_tensors(statement_jsonl_path, model_type, mode
 
 
 def load_input_tensors(input_jsonl_path, model_type, model_name, max_seq_length):
-    print("THERE IS SOME MAGIC GOING ON HERE")
     if model_type in ('lstm',):
         raise NotImplementedError
     elif model_type in ('gpt',):

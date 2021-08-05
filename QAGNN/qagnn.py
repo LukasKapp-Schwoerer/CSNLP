@@ -24,6 +24,12 @@ print ("pid:", os.getpid())
 print ("screen: %s" % subprocess.check_output('echo $STY', shell=True).decode('utf'))
 print ("gpu: %s" % subprocess.check_output('echo $CUDA_VISIBLE_DEVICES', shell=True).decode('utf'))
 
+def save_linear_layer_weights(model_dir, filename, model):
+    with torch.no_grad():
+        copy_of_weights = model.decoder.concept_emb.cpt_transform.weight.clone() 
+        raw_weights = copy_of_weights.cpu().numpy()
+        save_path = os.path.join(model_dir, filename)
+        np.save(save_path, raw_weights)
 
 def evaluate_accuracy(eval_set, model):
     n_samples, n_correct = 0, 0
@@ -116,6 +122,12 @@ def train(args):
     #   Load data                                                                                     #
     ###################################################################################################
     cp_emb = [np.load(path) for path in args.ent_emb_paths]
+
+    # quick fix TODO remove
+    padded = np.zeros((799273, 768))
+    padded[:100, :] = cp_emb[1]
+    cp_emb[1] = padded
+
     cp_emb = torch.tensor(np.concatenate(cp_emb, 1), dtype=torch.float)
 
     concept_num, concept_dim = cp_emb.size(0), cp_emb.size(1)
@@ -157,7 +169,6 @@ def train(args):
         model.encoder.to(device0)
         model.decoder.to(device1)
 
-
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
 
     grouped_parameters = [
@@ -198,6 +209,9 @@ def train(args):
         loss_func = nn.MarginRankingLoss(margin=0.1, reduction='mean')
     elif args.loss == 'cross_entropy':
         loss_func = nn.CrossEntropyLoss(reduction='mean')
+
+    # Saving the initialisation params for the linear layer as well
+    save_linear_layer_weights(args.save_dir, 'linlayerweights_init.npy', model)
 
     ###################################################################################################
     #   Training                                                                                      #
@@ -297,6 +311,10 @@ def train(args):
                         for p in model.named_parameters():
                             print (p, file=f)
                     print(f'model saved to {model_path}')
+
+            # save model parameters after the epoch
+            save_linear_layer_weights(args.save_dir, 'linlayerweights_' + str(epoch_id) + '.npy', model)
+
             model.train()
             start_time = time.time()
             if epoch_id > args.unfreeze_epoch and epoch_id - best_dev_epoch >= args.max_epochs_before_stop:
