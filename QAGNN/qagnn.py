@@ -123,10 +123,10 @@ def train(args):
     ###################################################################################################
     cp_emb = [np.load(path) for path in args.ent_emb_paths]
 
-    # quick fix TODO remove
-    padded = np.zeros((799273, 768))
-    padded[:100, :] = cp_emb[1]
-    cp_emb[1] = padded
+    # # quick fix TODO remove
+    # padded = np.zeros((799273, 768))
+    # padded[:100, :] = cp_emb[1]
+    # cp_emb[1] = padded
 
     cp_emb = torch.tensor(np.concatenate(cp_emb, 1), dtype=torch.float)
 
