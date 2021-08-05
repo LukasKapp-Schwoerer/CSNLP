@@ -35,12 +35,12 @@ EMB_PATHS = {
     'lm': 'data/transe/glove.transe.sgd.ent.npy',
     'numberbatch': 'data/transe/concept.nb.npy',
     'tzw': 'data/cpnet/tzw.ent.npy',
+    'wik': 'data/cpnet/concept_emb.npy',
 }
-
 
 def add_data_arguments(parser):
     # arguments that all datasets share
-    parser.add_argument('--ent_emb', default=['tzw'], choices=['tzw'], nargs='+', help='sources for entity embeddings')
+    parser.add_argument('--ent_emb', default=['tzw', 'wik'], choices=['tzw'], nargs='+', help='sources for entity embeddings')
     # dataset specific
     parser.add_argument('-ds', '--dataset', default='csqa', choices=DATASET_LIST, help='dataset name')
     parser.add_argument('-ih', '--inhouse', type=bool_flag, nargs='?', const=True, help='run in-house setting')
