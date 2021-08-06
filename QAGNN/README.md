@@ -1,3 +1,31 @@
+# Instructions for reproducing experiments
+
+Our various approaches are implemented in different branches:
+
+- For the baseline, use the branch "master" 
+- For the experiments on extending the relevance scoring with wiktionary, see branch "wiktionary_relevance_scoring"
+- For the experiments on augmenting the embeddings of the extracted ConceptNet nodes with wiktionary, see branch "embedding_of_extracted_nodes"
+- For the experiments on augmenting the embedding of the qa context node with wiktionary, see branch "embedding_of_qa_context_node"
+- For the experiments on grabling the concept name in the relevance scoring mechanism, see branch "analysis_garbling_concept_name_in_relevance_scoring"
+
+Once the correct branch is checked out and the QA-GNN dependencies listed futher below are installed follow these steps. On a machine with 128 CPU cores and 2xV100 32GB expect one run to take roughly 24h.
+- Execute `download_raw_data.sh`
+- Execute `python preprocess --run common`
+- Execute `python preprocess --run csqa`
+- Execute `run_qagnn__csqa.sh`
+
+# Usage of our Wiktionary dictionary
+``` python
+from wiktionary.wiktionary import Wiktionary
+
+wiktionary = Wiktionary()
+print("taking notes: ", wiktionary["taking notes"])
+```
+outputs
+```
+taking notes:  To make a record of what one hears or observes for future reference.
+```
+
 # QA-GNN: Question Answering using Language Models and Knowledge Graphs
 
 This repo provides the source code & data of our paper: [QA-GNN: Reasoning with Language Models and Knowledge Graphs for Question Answering](https://arxiv.org/abs/2104.06378) (NAACL 2021).
@@ -16,18 +44,6 @@ Webpage: [https://snap.stanford.edu/qagnn](https://snap.stanford.edu/qagnn)
 <p align="center">
   <img src="./figs/overview.png" width="1000" title="Overview of QA-GNN" alt="">
 </p>
-
-## Usage of Wiktionary
-``` python
-from wiktionary.wiktionary import Wiktionary
-
-wiktionary = Wiktionary()
-print("taking notes: ", wiktionary["taking notes"])
-```
-outputs
-```
-taking notes:  To make a record of what one hears or observes for future reference.
-```
 
 ## Usage of QA-GNN
 ### 0. Dependencies
